@@ -1,8 +1,9 @@
+import unsloth
+from unsloth import FastLanguageModel, is_bfloat16_supported
 import os
 import yaml
 from datasets import load_dataset
 from trl import SFTTrainer, SFTConfig
-from unsloth import FastLanguageModel, is_bfloat16_supported
 import torch
 import argparse
 
@@ -26,6 +27,7 @@ def main(cfg):
 
     trainer = SFTTrainer(
         model=model,
+        processing_class=tokenizer,
         train_dataset=dataset,
         args=SFTConfig(
             output_dir=cfg["output_dir"],
