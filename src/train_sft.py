@@ -95,9 +95,9 @@ def main(cfg):
             optim="adamw_8bit",
             max_length=int(cfg["max_seq_length"]),
             report_to="tensorboard",
+            dataset_text_field=cfg["dataset_text_field"],
         ),
         peft_config=peft_cfg,
-        dataset_text_field=cfg["dataset_text_field"],
         processing_class=tokenizer,
     )
 
