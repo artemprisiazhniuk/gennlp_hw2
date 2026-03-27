@@ -39,6 +39,16 @@ def add_example(x, text_field):
     }
 
 
+def format_example(example, tokenizer=None):
+    return {
+        "example": tokenizer.apply_chat_template(
+            example["messages"],
+            tokenize=False,
+            add_generation_prompt=False
+        )
+    }
+
+
 def preprocess(args):
     raw_dataset = load_dataset(args.dataset_name, "default", split="train")
     

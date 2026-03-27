@@ -6,3 +6,4 @@ gradio
 numpy
 trl 
 unsloth
+peft
