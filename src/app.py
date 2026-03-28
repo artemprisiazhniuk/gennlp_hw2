@@ -7,7 +7,7 @@ import yaml
 import torch
 from unsloth import FastLanguageModel
 
-from .inference import *
+from inference import *
 
 
 def chat(query, model, tokenizer):

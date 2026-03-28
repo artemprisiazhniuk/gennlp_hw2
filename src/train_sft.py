@@ -4,13 +4,6 @@ from unsloth import FastLanguageModel
 from datasets import load_dataset
 from trl import SFTTrainer, SFTConfig
 import torch
-from peft import (
-    PromptTuningConfig,
-    PromptTuningInit,
-    TaskType,
-    get_peft_model,
-)
-
 import os
 import yaml
 from functools import partial
