@@ -33,7 +33,7 @@ def add_example(x, text_field):
     
     return {
         "messages": [
-            {"role": "user", "content": f"Автор: {x['author']}\n Тема: {question}"},
+            {"role": "user", "content": question},
             {"role": "assistant", "content": x[text_field].strip()}
         ]
     }

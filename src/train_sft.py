@@ -24,35 +24,18 @@ def build_model(cfg):
         load_in_4bit=cfg["load_in_4bit"],
         dtype = torch.float16
     )
-    
-    method = cfg["method"].lower()
-    peft_cfg = None
 
-    if method in ["prompt", "both"]:
-        peft_cfg = PromptTuningConfig(
-            task_type=TaskType.CAUSAL_LM,
-            num_virtual_tokens=int(cfg["prompt_num_virtual_tokens"]),
-            prompt_tuning_init=(
-                PromptTuningInit.TEXT
-                if cfg.get("prompt_init_text")
-                else PromptTuningInit.RANDOM
-            ),
-            prompt_tuning_init_text=cfg.get("prompt_init_text", None),
-            tokenizer_name_or_path=cfg["model_name"] if cfg.get("prompt_init_text") else None,
-        )
+    model = FastLanguageModel.get_peft_model(
+        model,
+        r=int(cfg["lora_r"]),
+        lora_alpha=int(cfg["lora_alpha"]),
+        target_modules=cfg.get(
+            "target_modules",
+            ["q_proj", "k_proj", "v_proj", "o_proj"],
+        ),
+    )
 
-    if method in ["lora", "both"]:
-        model = FastLanguageModel.get_peft_model(
-            model,
-            r=int(cfg["lora_r"]),
-            lora_alpha=int(cfg["lora_alpha"]),
-            target_modules=cfg.get(
-                "target_modules",
-                ["q_proj", "k_proj", "v_proj", "o_proj"],
-            ),
-        )
-
-    return model, tokenizer, peft_cfg
+    return model, tokenizer
 
 
 def format_example(example, tokenizer=None, system_prompt=None):
@@ -72,7 +55,7 @@ def format_example(example, tokenizer=None, system_prompt=None):
     
 
 def main(cfg):
-    model, tokenizer, peft_cfg = build_model(cfg)
+    model, tokenizer = build_model(cfg)
 
     dataset = load_dataset("json", data_files=cfg["data_path"])["train"]
     dataset = dataset.map(partial(format_example, tokenizer=tokenizer, system_prompt=cfg.get("system_prompt")))
@@ -97,7 +80,6 @@ def main(cfg):
             report_to="tensorboard",
             dataset_text_field=cfg["dataset_text_field"],
         ),
-        peft_config=peft_cfg,
         processing_class=tokenizer,
     )
 
@@ -114,8 +96,6 @@ if __name__ == '__main__':
     parser.add_argument("--config", default="config.yaml")
     
     parser.add_argument("--output-path", default="outputs/")
-    
-    parser.add_argument("--method", choices=["lora", "prompt", "both"], default=None)
     
     parser.add_argument("--data-path", default="data/train.jsonl")
     
@@ -134,8 +114,5 @@ if __name__ == '__main__':
     cfg["output_dir"] = cfg.get("output_dir", args.output_path)
     cfg["logging_steps"] = args.logging_steps
     cfg["save_steps"] = args.save_steps
-    
-    if args.method is not None:
-        cfg["method"] = args.method
         
     main(cfg)

@@ -1,16 +1,16 @@
-model_name: "Qwen/Qwen3.5-2B"
+model_name: "unsloth/Qwen3-4B-Instruct-2507"
 max_seq_length: 2048
 load_in_4bit: true
 
 method: "lora"
 
-dataset_text_field: "example"
+dataset_text_field: "messages"
 
 lr: 2e-4
 
 batch_size: 2
 grad_accum: 8
-epochs: 1
+epochs: 10
 warmup_steps: 20
 lr_scheduler_type: "cosine"
 
@@ -21,8 +21,4 @@ target_modules:
   - "o_proj"
 
 system_prompt: |
-  Ты поэт. Ты отвечаешь выразительным, метафорическим языком.
-  Используй яркие образы и эмоциональный тон.
-
-prompt_num_virtual_tokens: 30
-prompt_init_text: поэт ассистент
+  Ты полезный ассистент и помогаешь отвечать на разные вопросы. Отвечай в 1-2 предложения.
